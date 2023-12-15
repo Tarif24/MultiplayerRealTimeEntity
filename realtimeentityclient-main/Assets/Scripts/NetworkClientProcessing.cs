@@ -1,34 +1,57 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
+using Unity.Collections;
+using Unity.Networking.Transport;
 using UnityEngine;
 
 static public class NetworkClientProcessing
 {
 
     #region Send and Receive Data Functions
-    static public void ReceivedMessageFromServer(string msg, TransportPipeline pipeline)
+    static public void ReceivedMessageFromServer(DataStreamReader streamReader)
     {
-        Debug.Log("Network msg received =  " + msg + ", from pipeline = " + pipeline);
 
-        string[] csv = msg.Split(',');
-        int signifier = int.Parse(csv[0]);
+        int signifier = streamReader.ReadInt();
 
-        // if (signifier == ServerToClientSignifiers.asd)
-        // {
+        if (signifier == ServerToClientSignifiers.NewBalloon)
+        {
+            float x = streamReader.ReadFloat();
+            float y = streamReader.ReadFloat();
+            Vector2 temp = new Vector2(x, y);
 
-        // }
-        // else if (signifier == ServerToClientSignifiers.asd)
-        // {
+            gameLogic.SpawnNewBalloon(temp);
+        }
+        else if (signifier == ServerToClientSignifiers.PoppedBalloon)
+        {
+            float x = streamReader.ReadFloat();
+            float y = streamReader.ReadFloat();
+            Vector2 temp = new Vector2(x, y);
 
-        // }
+            ProcessPoppedBalloon(temp);
+        }
+        else if (signifier == ServerToClientSignifiers.AllBalloon)
+        {
+
+        }
 
         //gameLogic.DoSomething();
 
     }
 
-    static public void SendMessageToServer(string msg, TransportPipeline pipeline)
+    static public void SendMessageToServer(string msg)
     {
-        networkClient.SendMessageToServer(msg, pipeline);
+        networkClient.SendMessageToServer(msg);
+    }
+
+    static public void SendPoppedBalloon(Vector2 location)
+    {
+        networkClient.SendPoppedBalloon(location);
+    }
+
+    static public void ProcessPoppedBalloon(Vector2 location)
+    {
+        gameLogic.DestroyBalloon(location);
     }
 
     #endregion
@@ -81,12 +104,14 @@ static public class NetworkClientProcessing
 #region Protocol Signifiers
 static public class ClientToServerSignifiers
 {
-    public const int asd = 1;
+    public const int PoppedBalloon = 0;
 }
 
 static public class ServerToClientSignifiers
 {
-    public const int asd = 1;
+    public const int NewBalloon = 0;
+    public const int PoppedBalloon = 1;
+    public const int AllBalloon = 2;
 }
 
 #endregion

@@ -11,7 +11,7 @@ public class NetworkClient : MonoBehaviour
     NetworkPipeline reliableAndInOrderPipeline;
     NetworkPipeline nonReliableNotInOrderedPipeline;
     const ushort NetworkPort = 9001;
-    const string IPAddress = "192.168.2.41";
+    const string IPAddress = "192.168.1.6";
 
     void Start()
     {
@@ -69,13 +69,9 @@ public class NetworkClient : MonoBehaviour
                     NetworkClientProcessing.ConnectionEvent();
                     break;
                 case NetworkEvent.Type.Data:
-                    int sizeOfDataBuffer = streamReader.ReadInt();
-                    NativeArray<byte> buffer = new NativeArray<byte>(sizeOfDataBuffer, Allocator.Persistent);
-                    streamReader.ReadBytes(buffer);
-                    byte[] byteBuffer = buffer.ToArray();
-                    string msg = Encoding.Unicode.GetString(byteBuffer);
-                    NetworkClientProcessing.ReceivedMessageFromServer(msg, pipelineUsed);
-                    buffer.Dispose();
+                 
+                    NetworkClientProcessing.ReceivedMessageFromServer(streamReader);
+
                     break;
                 case NetworkEvent.Type.Disconnect:
                     NetworkClientProcessing.DisconnectionEvent();
@@ -96,11 +92,9 @@ public class NetworkClient : MonoBehaviour
         return true;
     }
 
-    public void SendMessageToServer(string msg, TransportPipeline pipeline)
+    public void SendMessageToServer(string msg)
     {
         NetworkPipeline networkPipeline = reliableAndInOrderPipeline;
-        if (pipeline == TransportPipeline.FireAndForget)
-            networkPipeline = nonReliableNotInOrderedPipeline;
 
         byte[] msgAsByteArray = Encoding.Unicode.GetBytes(msg);
         NativeArray<byte> buffer = new NativeArray<byte>(msgAsByteArray, Allocator.Persistent);
@@ -112,6 +106,18 @@ public class NetworkClient : MonoBehaviour
         networkDriver.EndSend(streamWriter);
 
         buffer.Dispose();
+    }
+
+    public void SendPoppedBalloon(Vector2 location)
+    {
+        NetworkPipeline networkPipeline = reliableAndInOrderPipeline;
+
+        DataStreamWriter streamWriter;
+        networkDriver.BeginSend(networkPipeline, networkConnection, out streamWriter);
+        streamWriter.WriteInt(ClientToServerSignifiers.PoppedBalloon);
+        streamWriter.WriteFloat(location.x);
+        streamWriter.WriteFloat(location.y);
+        networkDriver.EndSend(streamWriter);
     }
 
     public void Connect()

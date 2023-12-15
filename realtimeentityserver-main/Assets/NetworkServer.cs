@@ -76,8 +76,7 @@ public class NetworkServer : MonoBehaviour
 
         #region Accept New Connections
 
-        while (AcceptIncomingConnection())
-            ;
+        while (AcceptIncomingConnection());
 
         #endregion
 
@@ -103,13 +102,9 @@ public class NetworkServer : MonoBehaviour
                 switch (networkEventType)
                 {
                     case NetworkEvent.Type.Data:
-                        int sizeOfDataBuffer = streamReader.ReadInt();
-                        NativeArray<byte> buffer = new NativeArray<byte>(sizeOfDataBuffer, Allocator.Persistent);
-                        streamReader.ReadBytes(buffer);
-                        byte[] byteBuffer = buffer.ToArray();
-                        string msg = Encoding.Unicode.GetString(byteBuffer);
-                        NetworkServerProcessing.ReceivedMessageFromClient(msg, connectionToIDLookup[networkConnections[i]], pipelineUsed);
-                        buffer.Dispose();
+                    
+                        NetworkServerProcessing.ReceivedMessageFromClient(streamReader, connectionToIDLookup[networkConnections[i]]);
+
                         break;
                     case NetworkEvent.Type.Disconnect:
                         NetworkConnection nc = networkConnections[i];
@@ -156,11 +151,9 @@ public class NetworkServer : MonoBehaviour
         return true;
     }
 
-    public void SendMessageToClient(string msg, int connectionID, TransportPipeline pipeline)
+    public void SendMessageToClient(string msg, int connectionID)
     {
         NetworkPipeline networkPipeline = reliableAndInOrderPipeline;
-        if(pipeline == TransportPipeline.FireAndForget)
-            networkPipeline = nonReliableNotInOrderedPipeline;
 
         byte[] msgAsByteArray = Encoding.Unicode.GetBytes(msg);
         NativeArray<byte> buffer = new NativeArray<byte>(msgAsByteArray, Allocator.Persistent);
@@ -172,6 +165,37 @@ public class NetworkServer : MonoBehaviour
         networkDriver.EndSend(streamWriter);
 
         buffer.Dispose();
+    }
+
+    public void SendNewBalloonToClient(Vector2 location)
+    {
+        NetworkPipeline networkPipeline = reliableAndInOrderPipeline;
+
+        foreach (NetworkConnection c in networkConnections)
+        {
+            DataStreamWriter streamWriter;
+            networkDriver.BeginSend(networkPipeline, c, out streamWriter);
+            streamWriter.WriteInt(ServerToClientSignifiers.NewBalloon);
+            streamWriter.WriteFloat(location.x);
+            streamWriter.WriteFloat(location.y);
+            networkDriver.EndSend(streamWriter);
+        }
+    }
+
+    public void SendPoppedBalloonToClient(Vector2 location)
+    {
+
+        NetworkPipeline networkPipeline = reliableAndInOrderPipeline;
+
+        foreach (NetworkConnection c in networkConnections)
+        {
+            DataStreamWriter streamWriter;
+            networkDriver.BeginSend(networkPipeline, c, out streamWriter);
+            streamWriter.WriteInt(ServerToClientSignifiers.PoppedBalloon);
+            streamWriter.WriteFloat(location.x);
+            streamWriter.WriteFloat(location.y);
+            networkDriver.EndSend(streamWriter);
+        }
     }
 
 }

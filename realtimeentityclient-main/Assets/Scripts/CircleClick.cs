@@ -14,6 +14,6 @@ public class CircleClick : MonoBehaviour
     }
     void OnMouseDown()
     {
-        Destroy(gameObject);
+        NetworkClientProcessing.SendPoppedBalloon(transform.position);
     }
 }

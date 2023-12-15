@@ -6,6 +6,7 @@ public class GameLogic : MonoBehaviour
 {
     float durationUntilNextBalloon;
     Sprite circleTexture;
+    public Dictionary<Vector2, GameObject> allBallons = new Dictionary<Vector2, GameObject>();
 
     void Start()
     {
@@ -14,17 +15,7 @@ public class GameLogic : MonoBehaviour
 
     void Update()
     {
-        durationUntilNextBalloon -= Time.deltaTime;
-
-        if (durationUntilNextBalloon < 0)
-        {
-            durationUntilNextBalloon = 1f;
-
-            float screenPositionXPercent = Random.Range(0.0f, 1.0f);
-            float screenPositionYPercent = Random.Range(0.0f, 1.0f);
-            Vector2 screenPosition = new Vector2(screenPositionXPercent * (float)Screen.width, screenPositionYPercent * (float)Screen.height);
-            SpawnNewBalloon(screenPosition);
-        }
+        
     }
 
     public void SpawnNewBalloon(Vector2 screenPosition)
@@ -42,6 +33,13 @@ public class GameLogic : MonoBehaviour
         Vector3 pos = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, 0));
         pos.z = 0;
         balloon.transform.position = pos;
+
+        allBallons.Add(pos, balloon);
         //go.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, -Camera.main.transform.position.z));
+    }
+
+    public void DestroyBalloon(Vector2 location)
+    {
+        Destroy(allBallons[location]);
     }
 }
