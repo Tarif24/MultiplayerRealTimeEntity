@@ -7,6 +7,7 @@ public class GameLogic : MonoBehaviour
     float durationUntilNextBalloon;
     Sprite circleTexture;
     public Dictionary<Vector2, GameObject> allBallons = new Dictionary<Vector2, GameObject>();
+    public List<Vector2> balloons = new List<Vector2>();
 
     void Start()
     {
@@ -18,7 +19,7 @@ public class GameLogic : MonoBehaviour
         
     }
 
-    public void SpawnNewBalloon(Vector2 screenPosition)
+    public void SpawnNewBalloon(Vector2 screenPercentage)
     {
         if (circleTexture == null)
             circleTexture = Resources.Load<Sprite>("Circle");
@@ -29,12 +30,16 @@ public class GameLogic : MonoBehaviour
         balloon.GetComponent<SpriteRenderer>().sprite = circleTexture;
         balloon.AddComponent<CircleClick>();
         balloon.AddComponent<CircleCollider2D>();
+        balloon.GetComponent<CircleClick>().ScreenPercentage = screenPercentage;
+
+        Vector2 screenPosition = new Vector2(screenPercentage.x * (float)Screen.width, screenPercentage.x * (float)Screen.height);
 
         Vector3 pos = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, 0));
         pos.z = 0;
         balloon.transform.position = pos;
 
-        allBallons.Add(pos, balloon);
+        allBallons.Add(screenPercentage, balloon);
+        balloons.Add(screenPercentage);
         //go.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, -Camera.main.transform.position.z));
     }
 

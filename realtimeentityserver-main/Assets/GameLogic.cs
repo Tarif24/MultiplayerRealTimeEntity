@@ -6,6 +6,7 @@ public class GameLogic : MonoBehaviour
 {
     float durationUntilNextBalloon;
     int intervalBetweenSpawns = 3;
+    public bool isClientIn = false;
 
     public List<Vector2> allBallons = new List<Vector2>();
 
@@ -19,13 +20,15 @@ public class GameLogic : MonoBehaviour
     {
         durationUntilNextBalloon -= Time.deltaTime;
 
-        if (durationUntilNextBalloon < 0)
+        if (durationUntilNextBalloon < 0 && isClientIn)
         {
             durationUntilNextBalloon = intervalBetweenSpawns;
 
             float screenPositionXPercent = Random.Range(0.0f, 1.0f);
             float screenPositionYPercent = Random.Range(0.0f, 1.0f);
-            Vector2 screenPosition = new Vector2(screenPositionXPercent * (float)Screen.width, screenPositionYPercent * (float)Screen.height);
+            Vector2 screenPosition = new Vector2(screenPositionXPercent, screenPositionYPercent);
+
+
 
             NetworkServerProcessing.SendNewBalloonToClient(screenPosition);
 

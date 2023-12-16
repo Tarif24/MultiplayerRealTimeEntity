@@ -123,9 +123,12 @@ public class NetworkServer : MonoBehaviour
 
     private bool AcceptIncomingConnection()
     {
+
         NetworkConnection connection = networkDriver.Accept();
         if (connection == default(NetworkConnection))
             return false;
+
+        NetworkServerProcessing.gameLogic.isClientIn = true;
 
         networkConnections.Add(connection);
 
@@ -138,6 +141,8 @@ public class NetworkServer : MonoBehaviour
         connectionToIDLookup.Add(connection, id);
 
         NetworkServerProcessing.ConnectionEvent(id);
+
+        SendAllBalloons(connection);
 
         return true;
     }
@@ -198,6 +203,26 @@ public class NetworkServer : MonoBehaviour
         }
     }
 
+    public void SendAllBalloons(NetworkConnection connection)
+    {
+        NetworkPipeline networkPipeline = reliableAndInOrderPipeline;
+
+        DataStreamWriter streamWriter;
+        networkDriver.BeginSend(networkPipeline, connection, out streamWriter);
+        streamWriter.WriteInt(ServerToClientSignifiers.AllBalloon);
+
+        foreach (Vector2 v2 in NetworkServerProcessing.gameLogic.allBallons)
+        {
+            streamWriter.WriteInt(1);
+            streamWriter.WriteFloat(v2.x);
+            streamWriter.WriteFloat(v2.y);
+        }
+
+        streamWriter.WriteInt(0);
+
+        networkDriver.EndSend(streamWriter);
+
+    }
 }
 
 public enum TransportPipeline

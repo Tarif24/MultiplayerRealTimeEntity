@@ -32,7 +32,18 @@ static public class NetworkClientProcessing
         }
         else if (signifier == ServerToClientSignifiers.AllBalloon)
         {
+            List<Vector2> allBallonsSent = new List<Vector2>();
 
+            while(streamReader.ReadInt() == 1)
+            {
+                float x = streamReader.ReadFloat();
+                float y = streamReader.ReadFloat();
+
+                Vector2 temp = new Vector2(x, y);
+                allBallonsSent.Add(temp);
+            }
+
+            ProcessAllBalloons(allBallonsSent);
         }
 
         //gameLogic.DoSomething();
@@ -52,6 +63,14 @@ static public class NetworkClientProcessing
     static public void ProcessPoppedBalloon(Vector2 location)
     {
         gameLogic.DestroyBalloon(location);
+    }
+
+    static public void ProcessAllBalloons(List<Vector2> allBalloons)
+    {
+        foreach (Vector2 v2 in allBalloons)
+        {
+            gameLogic.SpawnNewBalloon(v2);
+        }
     }
 
     #endregion

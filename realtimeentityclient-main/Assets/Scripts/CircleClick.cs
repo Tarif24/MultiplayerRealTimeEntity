@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CircleClick : MonoBehaviour
 {
+    public Vector2 ScreenPercentage = new Vector2();
+
     void Start()
     {
         
@@ -14,6 +16,6 @@ public class CircleClick : MonoBehaviour
     }
     void OnMouseDown()
     {
-        NetworkClientProcessing.SendPoppedBalloon(transform.position);
+        NetworkClientProcessing.SendPoppedBalloon(ScreenPercentage);
     }
 }

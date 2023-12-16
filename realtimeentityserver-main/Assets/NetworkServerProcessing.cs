@@ -66,7 +66,7 @@ static public class NetworkServerProcessing
 
     #region Setup
     static NetworkServer networkServer;
-    static GameLogic gameLogic;
+    static public GameLogic gameLogic;
 
     static public void SetNetworkServer(NetworkServer NetworkServer)
     {
