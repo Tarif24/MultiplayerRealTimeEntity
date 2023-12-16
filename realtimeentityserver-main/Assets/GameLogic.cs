@@ -26,13 +26,11 @@ public class GameLogic : MonoBehaviour
 
             float screenPositionXPercent = Random.Range(0.0f, 1.0f);
             float screenPositionYPercent = Random.Range(0.0f, 1.0f);
-            Vector2 screenPosition = new Vector2(screenPositionXPercent, screenPositionYPercent);
+            Vector2 screenPercentage = new Vector2(screenPositionXPercent, screenPositionYPercent);
 
+            NetworkServerProcessing.SendNewBalloonToClient(screenPercentage);
 
-
-            NetworkServerProcessing.SendNewBalloonToClient(screenPosition);
-
-            allBallons.Add(screenPosition);
+            allBallons.Add(screenPercentage);
         }
 
     }

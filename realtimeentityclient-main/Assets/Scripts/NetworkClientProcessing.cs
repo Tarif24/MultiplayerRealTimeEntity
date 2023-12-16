@@ -46,8 +46,6 @@ static public class NetworkClientProcessing
             ProcessAllBalloons(allBallonsSent);
         }
 
-        //gameLogic.DoSomething();
-
     }
 
     static public void SendMessageToServer(string msg)

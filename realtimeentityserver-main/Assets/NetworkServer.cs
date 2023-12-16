@@ -107,6 +107,7 @@ public class NetworkServer : MonoBehaviour
 
                         break;
                     case NetworkEvent.Type.Disconnect:
+
                         NetworkConnection nc = networkConnections[i];
                         int id = connectionToIDLookup[nc];
                         NetworkServerProcessing.DisconnectionEvent(id);

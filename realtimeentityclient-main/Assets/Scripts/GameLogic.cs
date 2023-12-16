@@ -7,7 +7,6 @@ public class GameLogic : MonoBehaviour
     float durationUntilNextBalloon;
     Sprite circleTexture;
     public Dictionary<Vector2, GameObject> allBallons = new Dictionary<Vector2, GameObject>();
-    public List<Vector2> balloons = new List<Vector2>();
 
     void Start()
     {
@@ -39,8 +38,6 @@ public class GameLogic : MonoBehaviour
         balloon.transform.position = pos;
 
         allBallons.Add(screenPercentage, balloon);
-        balloons.Add(screenPercentage);
-        //go.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, -Camera.main.transform.position.z));
     }
 
     public void DestroyBalloon(Vector2 location)

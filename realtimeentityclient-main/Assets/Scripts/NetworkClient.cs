@@ -108,15 +108,15 @@ public class NetworkClient : MonoBehaviour
         buffer.Dispose();
     }
 
-    public void SendPoppedBalloon(Vector2 location)
+    public void SendPoppedBalloon(Vector2 locationPercentage)
     {
         NetworkPipeline networkPipeline = reliableAndInOrderPipeline;
 
         DataStreamWriter streamWriter;
         networkDriver.BeginSend(networkPipeline, networkConnection, out streamWriter);
         streamWriter.WriteInt(ClientToServerSignifiers.PoppedBalloon);
-        streamWriter.WriteFloat(location.x);
-        streamWriter.WriteFloat(location.y);
+        streamWriter.WriteFloat(locationPercentage.x);
+        streamWriter.WriteFloat(locationPercentage.y);
         networkDriver.EndSend(streamWriter);
     }
 
